@@ -8,24 +8,25 @@ const ACCESS_KEY = "ro8RqJGTkP3APDUm2ic-O3WIkO7rar5ToMTlrg02qU4";
 
 const App = () => {
   const [photos, setPhotos] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('nature');
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Function to fetch photos based on the search query and page number
-  const fetchPhotos = async (query = 'nature', pageNum = 1) => {
+  // Fetch photos
+  const fetchPhotos = async (query = '', pageNum = 1) => {
+    if (!query) return; // Don't fetch without a query
     setIsLoading(true);
     try {
       const response = await fetch(
-        `https://api.unsplash.com/search/photos?query=${query}&page=${pageNum}&per_page=30&client_id=${ACCESS_KEY}`
+        `https://api.unsplash.com/search/photos?query=${query}&page=${pageNum}&per_page=12&client_id=${ACCESS_KEY}`
       );
       const data = await response.json();
       if (pageNum === 1) {
-        setPhotos(data.results); // reset photos on new search
+        setPhotos(data.results);
       } else {
-        setPhotos((prev) => [...prev, ...data.results]); // append new photos
+        setPhotos((prev) => [...prev, ...data.results]);
       }
     } catch (error) {
       console.error("Error fetching photos:", error);
@@ -35,19 +36,24 @@ const App = () => {
     }
   };
 
-  // Use effect hook to fetch photos whenever search query or page changes
+  // Fetch when searchQuery or page changes
   useEffect(() => {
-    fetchPhotos(searchQuery, page);
+    if (searchQuery) {
+      fetchPhotos(searchQuery, page);
+    }
   }, [searchQuery, page]);
 
   const handleSearchChange = (value) => {
     setSearchQuery(value);
-    setPage(1); // reset page when search query changes
   };
 
   const handleSearch = () => {
-    setPage(1); // reset page to 1 when initiating search
-    fetchPhotos(searchQuery, 1);
+    setPage(1); // Reset page
+    setPhotos([]); // Reset photos
+  };
+
+  const handleLoadMore = () => {
+    setPage(prev => prev + 1);
   };
 
   const handlePhotoClick = (photo, index) => {
@@ -76,10 +82,6 @@ const App = () => {
     }
   };
 
-  const handleLoadMore = () => {
-    setPage(page + 1); // increment page number to load more photos
-  };
-
   return (
     <div className="App">
       <Header
@@ -94,13 +96,13 @@ const App = () => {
           onClose={handleCloseDetails}
           onNext={handleNext}
           onPrev={handlePrev}
-          hasNext={selectedPhotoIndex < photos.length - 1}
-          hasPrev={selectedPhotoIndex > 0}
+          hasNext={selectedPhotoIndex !== null && selectedPhotoIndex < photos.length - 1}
+          hasPrev={selectedPhotoIndex !== null && selectedPhotoIndex > 0}
         />
       )}
 
       <div className="photo-grid">
-        {Array.isArray(photos) && photos.length > 0 ? (
+        {photos.length > 0 ? (
           photos.map((photo, index) => (
             <PhotoCard
               key={photo.id}
@@ -113,18 +115,18 @@ const App = () => {
         )}
       </div>
 
-      <div className="load-more-container">
-        <button className="load-more-btn" onClick={handleLoadMore} disabled={isLoading}>
-          {isLoading ? "Loading..." : "Load More"}
-        </button>
-      </div>
+      {photos.length > 0 && (
+        <div className="load-more-container">
+          <button className="load-more-btn" onClick={handleLoadMore} disabled={isLoading}>
+            {isLoading ? "Loading..." : "Load More"}
+          </button>
+        </div>
+      )}
     </div>
   );
 };
 
 export default App;
-
-
 
 
 
