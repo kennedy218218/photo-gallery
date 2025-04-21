@@ -1,5 +1,5 @@
 
-photo-gallery-97g5-8m9yw7g8u-kennedys-projects-7811375e.vercel.app
+photo-gallery-97g5-git-main-kennedys-projects-7811375e.vercel.app
 
 # Getting Started with Create React App
 
