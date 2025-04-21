@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import Header from './components/Header';
 import PhotoCard from './components/PhotoCard';
 import PhotoDetails from './components/PhotoDetails';
+import CategoryBar from './components/CategoryBar';
 import './App.css';
 
-// Unsplash API Access Key
 const ACCESS_KEY = "ro8RqJGTkP3APDUm2ic-O3WIkO7rar5ToMTlrg02qU4";
 
 const App = () => {
@@ -14,7 +14,8 @@ const App = () => {
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null);
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [isSearchMode, setIsSearchMode] = useState(false); // tracks if in search mode
+  const [isSearchMode, setIsSearchMode] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('Nature'); // default category
 
   const fetchPhotos = async (query = '', pageNum = 1) => {
     setIsLoading(true);
@@ -39,15 +40,17 @@ const App = () => {
     }
   };
 
-  // Initial/random photo fetch
+  // Load default category on first render
   useEffect(() => {
-    fetchPhotos('', 1); // Load random photos initially
-  }, []);
+    fetchPhotos('Nature', 1);
+    setIsSearchMode(false);
+    setActiveCategory('Nature');
+  }, [searchQuery,]);
 
-  // Fetch when page is updated (for "Load More" functionality)
+  // Load more photos when page changes
   useEffect(() => {
     if (page > 1) {
-      fetchPhotos(searchQuery, page);
+      fetchPhotos(searchQuery || activeCategory, page);
     }
   }, [page]);
 
@@ -56,9 +59,19 @@ const App = () => {
   };
 
   const handleSearch = () => {
+    if (searchQuery.trim() !== '') {
+      setPage(1);
+      setIsSearchMode(true);
+      fetchPhotos(searchQuery, 1);
+    }
+  };
+
+  const handleCategorySelect = (category) => {
+    setActiveCategory(category);
+    setSearchQuery('');
     setPage(1);
-    setIsSearchMode(searchQuery.trim() !== '');
-    fetchPhotos(searchQuery, 1);
+    setIsSearchMode(false);
+    fetchPhotos(category, 1);
   };
 
   const handleLoadMore = () => {
@@ -99,6 +112,8 @@ const App = () => {
         onSearch={handleSearch}
       />
 
+      <CategoryBar onSelectCategory={handleCategorySelect} />
+
       {selectedPhoto && (
         <PhotoDetails
           photo={selectedPhoto}
@@ -138,6 +153,7 @@ const App = () => {
 };
 
 export default App;
+
 
 
 
