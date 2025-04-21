@@ -1,26 +1,36 @@
 import React from 'react';
 
+
 const PhotoDetails = ({ photo, onClose, onNext, onPrev, hasNext, hasPrev }) => {
-  const { urls, user, alt_description, description } = photo;
+  if (!photo) return null;
 
   return (
     <div className="photo-details-overlay">
-      <div className="photo-details">
+      <div className="photo-details-container">
         <button className="close-btn" onClick={onClose}>✖</button>
+        <img className="photo-details-img" src={photo.urls.regular} alt={photo.alt_description || 'Photo'} />
 
-        {hasPrev && <button className="nav-btn prev-btn" onClick={onPrev}>←</button>}
-        {hasNext && <button className="nav-btn next-btn" onClick={onNext}>→</button>}
+        <div className="photo-info">
+          <h2>{photo.description || photo.alt_description || "Untitled"}</h2>
+          <p><strong>Photographer:</strong> {photo.user.name}</p>
+          <p><strong>Likes:</strong> {photo.likes}</p>
+          <a href={photo.links.download} target="_blank" rel="noopener noreferrer" className="download-btn">
+            Download
+          </a>
+        </div>
 
-        <img src={urls.regular} alt={alt_description || "Photo"} />
-        <h2>{alt_description || "Untitled Photo"}</h2>
-        <p><strong>Photographer:</strong> {user.name}</p>
-        {description && <p><em>{description}</em></p>}
+        <div className="nav-buttons">
+          {hasPrev && <button onClick={onPrev} className="nav-btn">← Prev</button>}
+          {hasNext && <button onClick={onNext} className="nav-btn">Next →</button>}
+        </div>
       </div>
     </div>
   );
 };
 
 export default PhotoDetails;
+
+
 
 
 
