@@ -14,9 +14,7 @@ const PhotoDetails = ({ photo, onClose, onNext, onPrev, hasNext, hasPrev }) => {
           <h2>{photo.description || photo.alt_description || "Untitled"}</h2>
           <p><strong>Photographer:</strong> {photo.user.name}</p>
           <p><strong>Likes:</strong> {photo.likes}</p>
-          <a href={photo.links.download} target="_blank" rel="noopener noreferrer" className="download-btn">
-            Download
-          </a>
+          
         </div>
 
         <div className="nav-buttons">
